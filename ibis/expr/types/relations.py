@@ -212,6 +212,9 @@ class Table(Expr, _FixedTextJupyterMixin):
 
         return PolarsData.convert_table(df, self.schema())
 
+    def _repr_html_(self):
+        return self.display()
+
     def _fast_bind(self, *args, **kwargs):
         # allow the first argument to be either a dictionary or a list of values
         if len(args) == 1:

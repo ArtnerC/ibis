@@ -280,6 +280,10 @@ class SQLBackend(BaseBackend, _DatabaseSchemaHandler):
         with self._safe_raw_sql(sql) as cur:
             result = self._fetch_from_cursor(cur, schema)
         return expr.__pandas_result__(result)
+    
+    def display(self, expr: ir.Expr, params: Mapping | None = None, limit: str | None = "default", **kwargs: Any):
+        """Display the results of an expression."""
+        return self.to_pandas(expr, params=params, limit=limit, **kwargs)._repr_html_()
 
     def drop_table(
         self,

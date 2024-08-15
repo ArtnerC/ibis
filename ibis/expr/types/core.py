@@ -405,6 +405,28 @@ class Expr(Immutable, Coercible):
             self, limit=limit, params=params, **kwargs
         )
 
+    def display(
+        self,
+        limit: int | str | None = "default",
+        params: Mapping[ir.Value, Any] | None = None,
+        **kwargs: Any,
+    ):
+        """Display the results of an expression in a rich format.
+
+        Parameters
+        ----------
+        limit
+            An integer to effect a specific row limit. A value of `None` means
+            "no limit". The default is in `ibis/config.py`.
+        params
+            Mapping of scalar parameter expressions to value
+        kwargs
+            Keyword arguments
+        """
+        return self._find_backend(use_default=True).display(
+            self, limit=limit, params=params, **kwargs
+        )
+
     def compile(
         self,
         limit: int | None = None,

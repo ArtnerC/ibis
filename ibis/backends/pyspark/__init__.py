@@ -441,6 +441,27 @@ class Backend(SQLBackend, CanListCatalog, CanCreateDatabase):
             result = PySparkPandasData.convert_table(df, schema)
         return expr.__pandas_result__(result)
 
+    def display(self, expr: ir.Expr, params: Mapping | None = None, limit: str | None = "default", **kwargs: Any):
+        """Display the results of an expression."""
+
+        self._run_pre_execute_hooks(expr)
+        table = expr.as_table()
+        sql = self.compile(table, params=params, limit=limit, **kwargs)
+
+        schema = table.schema()
+
+        with self._safe_raw_sql(sql) as query:
+            # If we're in a Databricks notebook environment, we can display the query using the builtin display() function
+            from IPython import get_ipython
+            if get_ipython().__class__.__name__ == 'DatabricksShell':
+                print('Running databricks display...')
+                from IPython.display import display
+                return query._repr_html_()
+
+            df = query.toPandas()  # blocks until finished
+            result = PySparkPandasData.convert_table(df, schema)
+        return expr.__pandas_result__(result)._repr_html_()
+
     def create_database(
         self,
         name: str,
