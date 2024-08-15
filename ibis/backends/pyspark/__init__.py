@@ -432,7 +432,8 @@ class Backend(SQLBackend, CanListCatalog, CanCreateDatabase):
             # If we're in a Databricks notebook environment, we can display the query using the builtin display() function
             if "DATABRICKS_RUNTIME_VERSION" in os.environ.keys():
                 print('Running databricks display...')
-                return display(query)
+                display(query)
+                return None
             
             df = query.toPandas()  # blocks until finished
             result = PySparkPandasData.convert_table(df, schema)
