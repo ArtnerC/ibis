@@ -430,8 +430,10 @@ class Backend(SQLBackend, CanListCatalog, CanCreateDatabase):
 
         with self._safe_raw_sql(sql) as query:
             # If we're in a Databricks notebook environment, we can display the query using the builtin display() function
-            if "DATABRICKS_RUNTIME_VERSION" in os.environ.keys():
+            from IPython import get_ipython
+            if get_ipython().__class__.__name__ == 'DatabricksShell':
                 print('Running databricks display...')
+                from IPython.display import display
                 display(query)
                 return None
 
