@@ -429,8 +429,14 @@ class Backend(SQLBackend, CanListCatalog, CanCreateDatabase):
         schema = table.schema()
 
         with self._safe_raw_sql(sql) as query:
-            df = query.toPandas()  # blocks until finished
-            result = PySparkPandasData.convert_table(df, schema)
+            # If we're in a Databricks notebook environment, we can display the query using the builtin display() function
+            if "DATABRICKS_RUNTIME_VERSION" in os.environ.keys() and "display" in globals():
+                print('Running databricks display...')
+                display(query)
+                return None
+            else:
+                df = query.toPandas()  # blocks until finished
+                result = PySparkPandasData.convert_table(df, schema)
         return expr.__pandas_result__(result)
 
     def create_database(
